@@ -1,0 +1,85 @@
+.home-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  background: #fff;
+  font-family: 'SUIT', sans-serif;
+  overflow: hidden;
+}
+
+.home-header {
+  padding-top: 24px;
+  text-align: center;
+}
+
+.home-date {
+  font-size: 14px;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.home-title {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.home-icons-fixed {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.home-icon {
+  font-size: 18px;
+  color: #666;
+}
+
+/* 🔽 사진 스크롤 영역 */
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.home-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding-bottom: 80px; /* footer 가려지지 않도록 */
+}
+
+.photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* 하단 고정 네비게이션 */
+.home-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  max-width: 480px;
+  height: 60px;
+  background: #fff;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+}
+
+.footer-icon {
+  font-size: 20px;
+  color: #aaa;
+}
+
+.footer-icon.main {
+  font-size: 26px;
+  color: #000;
+}
