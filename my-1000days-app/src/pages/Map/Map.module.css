@@ -1,0 +1,64 @@
+/* src/pages/Map/Map.module.css */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  padding: 0 12px;
+  border-bottom: 1px solid #eee;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+.title {
+  flex: 1;
+  text-align: center;
+}
+
+.searchBar {
+  padding: 10px 12px;
+}
+
+.searchBar input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+}
+
+.mapContainer {
+  flex: 1;
+  width: 100%;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  border-top: 1px solid #eee;
+  background-color: #fff;
+}
+
+.navbar button {
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: #999;
+}
+
+.navbar .active {
+  color: #FF5573;
+  font-weight: bold;
+}
