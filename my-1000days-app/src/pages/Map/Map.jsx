@@ -1,9 +1,12 @@
 // src/pages/Map/Map.jsx
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import styles from './Map.module.css';
 import NavigationBar from '@/components/NavigationBar/NavigationBar';
 
 const Map = () => {
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupImageUrl, setPopupImageUrl] = useState('');
+
   useEffect(() => {
     if (window.kakao) {
       const container = document.getElementById('map')
@@ -14,13 +17,23 @@ const Map = () => {
 
       const map = new window.kakao.maps.Map(container, options)
 
-      // 마커 클러스터러 (임시 데이터)
-      const markers = [
-        new kakao.maps.Marker({ position: new kakao.maps.LatLng(37.57, 126.98) }),
-        new kakao.maps.Marker({ position: new kakao.maps.LatLng(37.56, 126.97) }),
-        new kakao.maps.Marker({ position: new kakao.maps.LatLng(37.55, 126.96) }),
+      // 마커 클러스터러 (임시 데이터) 추후 db통신해서 가져오기
+      const markerData = [
+      { position: new kakao.maps.LatLng(37.57, 126.98), imageUrl: '/images/sample1.jpg' },
+  { position: new kakao.maps.LatLng(37.56, 126.97), imageUrl: '/images/sample2.jpg' },
+  { position: new kakao.maps.LatLng(37.55, 126.96), imageUrl: '/images/sample3.jpg' },
       ]
-
+      
+      const markers = markerData.map((item) => {
+      const marker = new kakao.maps.Marker({ position: item.position });
+        // 👉 클릭 이벤트 연결
+        kakao.maps.event.addListener(marker, 'click', () => {
+          setPopupImageUrl(item.imageUrl);
+          setPopupVisible(true);
+        });
+        return marker;
+      });
+    
       new kakao.maps.MarkerClusterer({
         map,
         averageCenter: true,
@@ -51,7 +64,13 @@ const Map = () => {
       </div>
 
       <div id="map" className={styles.mapContainer}></div>
-
+      {popupVisible && (
+        <div className={styles.popupOverlay} onClick={() => setPopupVisible(false)}>
+          <div className={styles.popupBox}>
+            <img src={popupImageUrl} alt="popup" />
+          </div>
+        </div>
+      )}
       <NavigationBar/>
     </div>
   )

@@ -41,6 +41,7 @@
 .mapContainer {
   flex: 1;
   width: 100%;
+  
 }
 
 .navbar {
@@ -61,4 +62,32 @@
 .navbar .active {
   color: #FF5573;
   font-weight: bold;
+}
+
+/* 기존 스타일 아래에 추가 */
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.popupBox {
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 90%;
+  max-height: 80%;
+}
+
+.popupBox img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
 }
