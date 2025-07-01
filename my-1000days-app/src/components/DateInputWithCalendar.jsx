@@ -38,6 +38,7 @@ function DateInputWithCalendar({ selected, onChange }) {
             onSelect={handleDateSelect}
             fromYear={1990}
             toYear={2030}
+            defaultMonth={selected}
             captionLayout="dropdown" // ✅ 년도 선택 가능하게
             locale={ko} // ✅ 한글 로케일 적용
 
