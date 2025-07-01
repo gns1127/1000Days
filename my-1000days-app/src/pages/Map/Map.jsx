@@ -20,8 +20,8 @@ const Map = () => {
       // 마커 클러스터러 (임시 데이터) 추후 db통신해서 가져오기
       const markerData = [
       { position: new kakao.maps.LatLng(37.57, 126.98), imageUrl: '/images/sample1.jpg' },
-  { position: new kakao.maps.LatLng(37.56, 126.97), imageUrl: '/images/sample2.jpg' },
-  { position: new kakao.maps.LatLng(37.55, 126.96), imageUrl: '/images/sample3.jpg' },
+      { position: new kakao.maps.LatLng(37.56, 126.97), imageUrl: '/images/sample2.jpg' },
+      { position: new kakao.maps.LatLng(37.55, 126.96), imageUrl: '/images/sample3.jpg' },
       ]
       
       const markers = markerData.map((item) => {
@@ -66,8 +66,23 @@ const Map = () => {
       <div id="map" className={styles.mapContainer}></div>
       {popupVisible && (
         <div className={styles.popupOverlay} onClick={() => setPopupVisible(false)}>
-          <div className={styles.popupBox}>
-            <img src={popupImageUrl} alt="popup" />
+          <div className={styles.memoryCard} onClick={(e) => e.stopPropagation()}>
+            <img src={popupImageUrl} alt="popup" className={styles.memoryImage} />
+
+            <div className={styles.memoryContent}>
+              <h2 className={styles.title}>데이트했던 북악산!</h2>
+              <p className={styles.dateLocation}>2023.09.14 &nbsp;·&nbsp; 북악팔각정</p>
+              <p className={styles.desc}>정말 멋진 풍경과 함께한 하수~</p>
+
+              <div className={styles.actions}>
+                <span>♡ 좋아요 3</span>
+                <span>💬 댓글 2</span>
+              </div>
+
+              <div className={styles.link}>
+                <a href="#">자세히 보기 &gt;</a>
+              </div>
+            </div>
           </div>
         </div>
       )}

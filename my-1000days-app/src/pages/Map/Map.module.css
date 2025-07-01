@@ -67,17 +67,79 @@
 /* 기존 스타일 아래에 추가 */
 .popupOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 999;
+  align-items: center; /* ✅ 화면 정중앙에 팝업 정렬 */
+  z-index: 1000;
 }
 
+.memoryCard {
+  background: #fff;
+  border-radius: 20px 20px 20px 20px;
+  width: 100%;
+  max-width: 380px;
+  margin-bottom: env(safe-area-inset-bottom);
+  overflow: hidden;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+.memoryImage {
+  width: 100%;
+  height: 300px;
+  display: block;
+}
+
+.memoryContent {
+  padding: 16px;
+  color: #333;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.dateLocation {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.desc {
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.actions {
+  font-size: 14px;
+  color: #666;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.link {
+  font-size: 14px;
+  color: #e6005a;
+  font-weight: bold;
+}
+.link a {
+  text-decoration: none;
+  color: inherit;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0%);
+  }
+}
 .popupBox {
   background: #fff;
   padding: 10px;
