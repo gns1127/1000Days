@@ -8,6 +8,7 @@ import test from '@/assets/image/test_img.jpg'  // 정적 이미지 import 추�
 
 const Home = () => {
 
+  // test 입니다.
   const today = new Date();
   const date = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
   
