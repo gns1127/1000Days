@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import styles from './Map.module.css';
 import NavigationBar from '@/components/NavigationBar/NavigationBar';
+import { AiOutlineClose } from 'react-icons/ai';
 
 const Map = () => {
   const [popupVisible, setPopupVisible] = useState(false);
@@ -65,8 +66,13 @@ const Map = () => {
 
       <div id="map" className={styles.mapContainer}></div>
       {popupVisible && (
-        <div className={styles.popupOverlay} onClick={() => setPopupVisible(false)}>
+        <div className={styles.popupOverlay} /* onClick={() => setPopupVisible(false) } */>
           <div className={styles.memoryCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.closeDiv}>
+              <button className={styles.close_btn} onClick={() => setPopupVisible(false)}>
+                <AiOutlineClose size={24} />
+              </button>
+            </div>
             <img src={popupImageUrl} alt="popup" className={styles.memoryImage} />
 
             <div className={styles.memoryContent}>

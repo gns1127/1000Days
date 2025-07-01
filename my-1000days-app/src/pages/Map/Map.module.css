@@ -86,9 +86,23 @@
   animation: slideUp 0.3s ease;
 }
 
+.closeDiv{
+  display: flex;
+  justify-content: end;
+  height: 30px;
+}
+
+.close_btn{
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  margin: 10px;
+}
+
 .memoryImage {
   width: 100%;
   height: 300px;
+  margin-top: 5px;
   display: block;
 }
 
