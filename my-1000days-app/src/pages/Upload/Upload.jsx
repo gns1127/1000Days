@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import EXIF from 'exif-js';
 import './Upload.css';
 import { getDate, getMonth } from 'date-fns';
@@ -12,15 +12,24 @@ const Upload = () => {
   const [description, setDescription] = useState('');
   const [latLng, setLatLng] = useState(null); // 좌표 저장용
 
+  const fileInputRef = useRef();
+
   const MAX_FILES = 10;
 
   const handleFileChange = (e) => {
+
+    const dataTransfer = new DataTransfer();
+
     let selectedFiles = Array.from(e.target.files);
 
     if( selectedFiles.length > MAX_FILES ){
       alert(`최대 ${MAX_FILES}장까지만 업로드가능 합니다.`);
       selectedFiles = selectedFiles.slice(0, MAX_FILES);
+
+      selectedFiles.forEach( file => dataTransfer.items.add( file ));
+      fileInputRef.current.files = dataTransfer.files;
     }
+
 
     setFiles(selectedFiles);
     const urls = selectedFiles.map(file => URL.createObjectURL(file));
@@ -92,6 +101,7 @@ const Upload = () => {
     };
   }, [previewUrls]);
 
+  // 한글자 일시 앞에 '0' 추가
   const padZero = ( input ) => {
     const str = String(input);
     return str.length === 1 ? '0' + str : str;
@@ -103,16 +113,57 @@ const Upload = () => {
 
   };
 
+  const removeImage = ( indexToRemove ) => {
+
+    // 메모리 정리
+    URL.revokeObjectURL(previewUrls[indexToRemove]);
+
+    const dataTransfer = new DataTransfer();
+    console.log( indexToRemove );
+    // FileList를 변경하기 위한 객체( Drag and Drop API )
+
+    const nextFiles = files.filter((_, i) => i !== indexToRemove);
+    const nextPreviews = previewUrls.filter((_, i) => i !== indexToRemove);
+
+    setFiles(nextFiles);
+    setPreviewUrls(nextPreviews);
+
+    nextFiles.forEach( file => dataTransfer.items.add(file));
+
+    //fileInputRef.current.value = null; // ✅ 파일 input도 초기화
+    fileInputRef.current.files = dataTransfer.files;
+  }
+
+  /**
+   * 리스트 동적 생성시 key 필수
+   * react는 리스트 요소를 렌더링할때 key를 기준으로 어떤 요소가 추가/삭제/변경 됬는지 판단
+   * 
+   * key가 없거나 중복되면 -> 렌더링 최적화가 깨지고 버그 발생 가능
+   * key는 고유한 값
+   * key는 최상위 객체만 위치, 하위 객체가 key를 가져도 아무런 효과 X key 중복시 디버깅 어려움
+   * 
+   * 
+   * ex) 
+   * {previewUrls.map((url, idx) => (
+            <div key={idx} className='preview-wrapper'>
+              <img src={url} alt={`preview-${idx}`} className="preview-image" />
+              <button className='remove-button' onClick={( ) => removeImage( idx )}>x</button>
+            </div>
+          ))}
+   */
   return (
     <div className="upload-container">
       <h2>추억 업로드</h2>
       <form onSubmit={handleSubmit} className="upload-form">
         <label className="upload-box" htmlFor="file-input"></label>
-        <input id="file-input" type="file" accept="image/*" multiple onChange={handleFileChange} />
-
+        <input id="file-input" type="file" accept="image/*" multiple onChange={handleFileChange} ref={fileInputRef}/>
+        
         <div className="preview-gallery">
           {previewUrls.map((url, idx) => (
-            <img key={idx} src={url} alt={`preview-${idx}`} className="preview-image" />
+            <div key={idx} className='preview-wrapper'>
+              <img src={url} alt={`preview-${idx}`} className="preview-image" />
+              <button className='remove-button' onClick={( ) => removeImage( idx )}>x</button>
+            </div>
           ))}
         </div>
 

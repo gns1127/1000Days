@@ -46,3 +46,26 @@
   font-size: 1rem;
   cursor: pointer;
 }
+
+.preview-wrapper {
+  position: relative;
+
+  margin: 10px 0;
+}
+
+.remove-button {
+  position: absolute;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  /*color: white;*/
+
+  top: 0px;
+  right: 0px;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
