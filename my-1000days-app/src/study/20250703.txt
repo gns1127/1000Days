@@ -1,0 +1,46 @@
+📌 React 렌더링이란?
+**“React 컴포넌트가 상태(state)나 props의 변경에 따라 UI를 다시 그리는 과정”**이야.
+
+(1) setState / props 변경
+       ↓
+(2) 함수형 컴포넌트 재실행 (JSX 반환)
+       ↓
+(3) 가상 DOM(Virtual DOM) 생성
+       ↓
+(4) 이전 가상 DOM과 비교 (Diffing)
+       ↓
+(5) 달라진 부분만 실제 DOM에 반영 (Reconciliation)
+       ↓
+(6) useEffect, useLayoutEffect 실행
+
+
+
+📌 1. 람다 함수란?
+람다 함수는 이름 없이도 쓸 수 있는 짧은 함수 표현식이야.
+JavaScript에서는 ()=>{} 형태로 사용하는 **화살표 함수(arrow function)**가 람다 함수에 해당해.
+
+
+🔥 가장 큰 차이: this 바인딩
+
+function Timer() {
+  this.seconds = 0;
+
+  setInterval(function () {
+    this.seconds++; // ❌ 'this'는 Window
+  }, 1000);
+}
+
+🛠 해결 방법 1 (화살표 함수 사용):
+
+function Timer() {
+  this.seconds = 0;
+
+  setInterval(() => {
+    this.seconds++; // ✅ 'this'는 Timer 인스턴스를 유지
+  }, 1000);
+}
+
+
+<button onClick={nextPhoto}>✅ 동작함</button>
+<button onClick={() => nextPhoto}>❌ 안 됨</button>
+<button onClick={() => nextPhoto()}>✅ 동작함 (람다)</button>

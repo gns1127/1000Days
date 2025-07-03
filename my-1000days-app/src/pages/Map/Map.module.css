@@ -96,7 +96,7 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  margin: 10px;
+  margin: 6px 10px 5px 0px;
 }
 
 .memoryImage {
@@ -166,4 +166,37 @@
   width: 100%;
   height: auto;
   border-radius: 8px;
+}
+
+/* 슬라이드 이미지 영역 */
+.sliderWrapper {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.slideBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.6);
+  border: none;
+  font-size: 24px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.slideBtn:first-of-type {
+  left: 12px;
+}
+
+.slideBtn:last-of-type {
+  right: 12px;
 }
