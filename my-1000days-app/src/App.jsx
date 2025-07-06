@@ -3,6 +3,7 @@ import Login from './pages/Login/Login';
 import Home from './pages/Home/Home';
 import Map from './pages/Map/Map';
 import Upload from './pages/Upload/Upload';
+import Feed from './pages/Feed/Feed';
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/map" element={<Map />} />
         <Route path="/upload" element={<Upload />} />
+        <Route path="/feed" element={<Feed />} />
       </Routes>
     </BrowserRouter>
   );
