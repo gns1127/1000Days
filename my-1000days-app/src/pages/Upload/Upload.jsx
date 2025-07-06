@@ -115,7 +115,11 @@ const Upload = () => {
 
   const removeImage = ( indexToRemove ) => {
 
-    // 메모리 정리
+    // 메모리 정리 + 브라우저 리렌더 충돌 방지 
+    /*
+      브라우저가 계속 해당 파일(blob)을 메모리에서 참조 중이라 렌더링/캐시 오류가 발생할 수 있음
+      Vite dev 환경에서는 이게 파일시스템 감지와 충돌해서 서버 리로드를 유발할 수 있어.
+    */
     URL.revokeObjectURL(previewUrls[indexToRemove]);
 
     const dataTransfer = new DataTransfer();
@@ -150,7 +154,7 @@ const Upload = () => {
               <button className='remove-button' onClick={( ) => removeImage( idx )}>x</button>
             </div>
           ))}
-   */
+  */
   return (
     <div className="upload-container">
       <h2>추억 업로드</h2>
