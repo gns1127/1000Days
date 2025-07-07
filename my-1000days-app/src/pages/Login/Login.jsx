@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // ✅ 페이지 이동을 위한 훅
 import './Login.css';
-import heartLogo from '@/assets/image/heartLogo.png'
+import heartLogo from '@/assets/image/heartLogo.png';
 import DateInputWithCalendar from '@/components/DateInputWithCalendar';
-import LoginButton from '@/components/LoginButton'
+import LoginButton from '@/components/LoginButton';
+import { supabase } from '../../services/supabase';
+import { useAuth  } from '../../features/auth/useAuth'
 
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
+
+const email    = import.meta.env.VITE_EMAIL    || '';
+const password = import.meta.env.VITE_PASSWORD || '';
 
 const Login = () => {
   const [selected, setSelected] = useState(null); // ✅ 날짜 상태 관리
 
   const navigate = useNavigate(); // ✅ 페이지 이동
 
-  const handleCheckDate = () => {
+  const { loginWithEmail, error, loading } = useAuth();
+  const handleCheckDate = async () => {
     if (!selected) {
       alert('날짜를 선택해주세요.');
       return;
@@ -26,11 +32,21 @@ const Login = () => {
 
     if (formatted === '20231127') {
       alert('정답');
-      navigate('/home'); // ✅ 이동
+      try {
+        await loginWithEmail(email, password);
+        console.log('로그인 성공 이동중..');
+        //setMessage('로그인 성공! 이동 중…');
+        navigate('/home'); // ✅ 이동
+        
+    } catch (err) {
+      //setMessage(`로그인 실패: ${err.message}`);
+    }
+
     } else {
       alert('틀렸습니다.');
     }
   };
+
 
   return (
     <div className="login">
