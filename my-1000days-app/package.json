@@ -11,6 +11,7 @@
     "postinstall": " patch-package"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.50.3",
     "date-fns": "^4.1.0",
     "exif-js": "^2.3.0",
     "patch-package": "^8.0.0",
