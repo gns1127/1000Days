@@ -39,7 +39,7 @@ export function useAuth() {
   // 이메일 로그인
   const loginWithEmail = useCallback (async( email, password ) => {
     
-    debugger;
+    
 
     setLoading(true);
     setError(null);
@@ -48,6 +48,8 @@ export function useAuth() {
       email,
       password,
     });
+
+    console.log( '현재 로그인된 유저 :: ' + data.user.id );
 
     if (error) {
       setError(`로그인 실패: ${error.message}`);

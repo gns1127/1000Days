@@ -72,24 +72,31 @@ const Upload = () => {
       return;
     }
 
+    const session = await supabase.auth.getSession();
+    console.log('세션 있음?', session);
+    console.log( 'user.id :: ' , user.id );
     setStatus('피드 생성 중…');
     try {
       // 1) feeds 테이블에 피드 정보 insert
       const feedPayload = {
         user_id:        user.id,
-        title,
-        description,
-        location,
+        title : 'test123',
+        description : '설명 테스트',
+        location : '위치 테스트',
         location_lat:   latLng?.lat || null,
         location_lng:   latLng?.lng || null,
         feed_date:      date || new Date().toISOString(),
         // created_at, updated_at는 DB default
       };
+
+
+      console.log( feedPayload );
+
       const { data: feedData, error: feedErr } = await supabase
         .from('feeds')
         .insert([feedPayload])
-        .select('id')
-        .single();
+        .select('id');
+        // .single();
       if (feedErr) throw feedErr;
       const feedId = feedData.id;
 
