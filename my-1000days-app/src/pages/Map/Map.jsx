@@ -1,24 +1,37 @@
 // src/pages/Map/Map.jsx
 import React, { useEffect, useState } from 'react'
 import styles from './Map.module.css';
+import {useAuth} from '../../features/auth/useAuth';
+import {supabase} from '../../services/supabase';
+
 
 import NavigationBar from '@/components/NavigationBar/NavigationBar';
 import { AiOutlineClose } from 'react-icons/ai';
-import test from '@/assets/image/test_img.jpg'  // 정적 이미지 import 추후 동적 이미지로 변경
-import test2 from '@/assets/image/test_img2.jpg'  // 정적 이미지 import 추후 동적 이미지로 변경
-import test3 from '@/assets/image/test_img3.jpg'  // 정적 이미지 import 추후 동적 이미지로 변경
+import test from '@/assets/image/test_img.jpg';  // 정적 이미지 import 추후 동적 이미지로 변경
+import test2 from '@/assets/image/test_img2.jpg';  // 정적 이미지 import 추후 동적 이미지로 변경
+import test3 from '@/assets/image/test_img3.jpg';  // 정적 이미지 import 추후 동적 이미지로 변경
+import { constructNow } from 'date-fns';
+
 
 const Map = () => {
+
+  const { user } = useAuth(); 
+  const [feedData, setFeedData] = useState([]);
   const [popupVisible, setPopupVisible] = useState(false);
   const [currentIndex, setCurrentIndex ] = useState(0);
   //const [popupImageUrl, setPopupImageUrl] = useState(''); 
   const photos = [ test, test2 ,test3 ];
 
+  
+
   const prePhoto = () => {  if( currentIndex > 0 ) setCurrentIndex( currentIndex - 1) };
   const nextPhoto = () => {     if( currentIndex < photos.length -1 ) setCurrentIndex( currentIndex + 1)   };
 
   const fn_test = () => { console.log( 'test 실행 ')};
-  useEffect(() => {
+  useEffect( () => {
+    // feed data 
+
+
     if (window.kakao) {
       const container = document.getElementById('map')
       const options = {
@@ -26,15 +39,41 @@ const Map = () => {
         level: 7,
       }
 
-      const map = new window.kakao.maps.Map(container, options)
 
+      const map = new window.kakao.maps.Map(container, options)
+      
       // 마커 클러스터러 (임시 데이터) 추후 db통신해서 가져오기
       const markerData = [
-        { position: new kakao.maps.LatLng(37.57, 126.98), imageUrl: '/images/sample1.jpg' },
-        { position: new kakao.maps.LatLng(37.56, 126.97), imageUrl: '/images/sample2.jpg' },
-        { position: new kakao.maps.LatLng(37.55, 126.96), imageUrl: '/images/sample3.jpg' },
+        { position: new kakao.maps.LatLng(37.57, 126.98), id: 999 },
+        { position: new kakao.maps.LatLng(37.56, 126.97), id: 998 },
+        { position: new kakao.maps.LatLng(37.55, 126.96), id: 997 },
       ]
+
+      // 피드 데이터 조회
+      const selectFeed = async () => {
+        console.log( 'selectFeed 실행' );  
+        console.log( user );
+        let { data , error } = await supabase
+        .from('feeds')
+        .select('*')
+        .in('user_id', [user.id, /* 그룹 아이디 다 넣기 추후 */]);
+
+        setFeedData( data );
+      }
+
+      selectFeed();
       
+      console.log( feedData );
+
+      feedData.forEach(e => {
+
+
+        markerData.push( { position: new kakao.maps.LatLng(e.location_lat, e.location_lng), id: e.id } );
+
+      });
+
+      console.log( 'markerData' ); 
+      console.log( markerData );
       const markers = markerData.map((item) => {
       const marker = new kakao.maps.Marker({ position: item.position });
         // 👉 클릭 이벤트 연결
