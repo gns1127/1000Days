@@ -80,9 +80,9 @@ const Upload = () => {
       // 1) feeds 테이블에 피드 정보 insert
       const feedPayload = {
         user_id:        user.id,
-        title : 'test123',
-        description : '설명 테스트',
-        location : '위치 테스트',
+        title : title,
+        description : description,
+        location : location,
         location_lat:   latLng?.lat || null,
         location_lng:   latLng?.lng || null,
         feed_date:      date || new Date().toISOString(),
@@ -95,11 +95,15 @@ const Upload = () => {
       const { data: feedData, error: feedErr } = await supabase
         .from('feeds')
         .insert([feedPayload])
-        .select('id');
-        // .single();
+        .select()
+        .single();
+
+      console.log( 'feedData' );
+      console.log( feedData );
       if (feedErr) throw feedErr;
       const feedId = feedData.id;
 
+      console.log( 'feedId :: ', feedId );
       // 2) 각 파일 업로드 + feed_photos insert
       setStatus('사진 업로드 중…');
       for (let i = 0; i < files.length; i++) {
@@ -120,6 +124,8 @@ const Upload = () => {
           .from('photos')
           .getPublicUrl(fileName);
         if (urlErr) throw urlErr;
+
+        console.log( 'feedId :: ', feedId );
 
         // 2-3) feed_photos에 insert
         const photoPayload = {
