@@ -1,8 +1,10 @@
 // src/pages/Map/Map.jsx
 import React, { useEffect, useState } from 'react'
 import styles from './Map.module.css';
-import {useAuth} from '../../features/auth/useAuth';
-import {supabase} from '../../services/supabase';
+
+
+import { useAuth } from '../../features/auth/useAuth';
+import { supabase } from '../../services/supabase';
 
 
 import NavigationBar from '@/components/NavigationBar/NavigationBar';
@@ -15,22 +17,72 @@ import { constructNow } from 'date-fns';
 
 const Map = () => {
 
-  const { user } = useAuth(); 
+  /* ───────── 인증 상태 ───────── */
+  const { user } = useAuth();
+
+  /* ───────── 로컬 state ───────── */
   const [feedData, setFeedData] = useState([]);
+  const [currentFeed, setcurrentFeed] = useState(null);
   const [popupVisible, setPopupVisible] = useState(false);
-  const [currentIndex, setCurrentIndex ] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   //const [popupImageUrl, setPopupImageUrl] = useState(''); 
-  const photos = [ test, test2 ,test3 ];
+  const [photos, setPhotos] = useState([]);
 
-  
+  /* ───────── 로그인 안 된 경우 가드 ───────── */
+  //if (!user) return navigate('/login');
 
-  const prePhoto = () => {  if( currentIndex > 0 ) setCurrentIndex( currentIndex - 1) };
-  const nextPhoto = () => {     if( currentIndex < photos.length -1 ) setCurrentIndex( currentIndex + 1)   };
 
-  const fn_test = () => { console.log( 'test 실행 ')};
-  useEffect( () => {
-    // feed data 
+  const prePhoto = () => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1) };
+  const nextPhoto = () => { if (currentIndex < photos.length - 1) setCurrentIndex(currentIndex + 1) };
 
+  //const fn_test = () => { console.log( 'test 실행 ')};
+  const fetchFeedPhotos = async (feedId) => {
+    const { data, error } = await supabase
+      .from('feeds_photo')
+      .select('image_url')
+      .eq('feed_id', feedId);
+
+    if (error) {
+      console.error('📸 feeds_photo 조회 실패:', error);
+      return;
+    }
+
+    setPhotos(data.map((d) => d.image_url)); // 또는 전체 data 그대로
+  };
+
+
+  /* 피드 조회 */
+  useEffect(() => {
+    if (!user) return;      // 아직 세션이 안 왔으면 기다림
+
+    // 피드 데이터 조회
+    const selectFeed = async () => {
+
+      console.log('selectFeed 실행');
+      if (!user) return;                  // user 준비됐는지 가드
+      console.log(user);
+
+      const { data, error } = await supabase
+        .from('feeds')
+        .select('*')
+        .in('user_id', [user.id]);
+
+      if (error) {
+        console.error('피드 조회 오류:', error);
+        return;
+      }
+
+      console.log('supabase 결과:', data); // ✅ 쿼리 결과 즉시 확인 
+      setFeedData(data);
+    };
+
+    selectFeed();
+    console.log(feedData);
+
+  }, [user]);
+
+  /* 지도 생성 */
+  useEffect(() => {
 
     if (window.kakao) {
       const container = document.getElementById('map')
@@ -41,7 +93,7 @@ const Map = () => {
 
 
       const map = new window.kakao.maps.Map(container, options)
-      
+
       // 마커 클러스터러 (임시 데이터) 추후 db통신해서 가져오기
       const markerData = [
         { position: new kakao.maps.LatLng(37.57, 126.98), id: 999 },
@@ -49,44 +101,29 @@ const Map = () => {
         { position: new kakao.maps.LatLng(37.55, 126.96), id: 997 },
       ]
 
-      // 피드 데이터 조회
-      const selectFeed = async () => {
-        console.log( 'selectFeed 실행' );  
-        console.log( user );
-        let { data , error } = await supabase
-        .from('feeds')
-        .select('*')
-        .in('user_id', [user.id, /* 그룹 아이디 다 넣기 추후 */]);
-
-        setFeedData( data );
-      }
-
-      selectFeed();
-      
-      console.log( feedData );
-
       feedData.forEach(e => {
-
-
-        markerData.push( { position: new kakao.maps.LatLng(e.location_lat, e.location_lng), id: e.id } );
-
+        markerData.push({ position: new kakao.maps.LatLng(e.location_lat, e.location_lng), id: e.id, feed });
       });
 
-      console.log( 'markerData' ); 
-      console.log( markerData );
+      console.log('markerData');
+      console.log(markerData);
       const markers = markerData.map((item) => {
-      const marker = new kakao.maps.Marker({ position: item.position });
+        const marker = new kakao.maps.Marker({ position: item.position });
         // 👉 클릭 이벤트 연결
         kakao.maps.event.addListener(marker, 'click', () => {
-          //setPopupImageUrl(item.imageUrl);
-          setPopupVisible(true);
 
+          // Feed 이미지 연결
+          fetchFeedPhotos( item.id );
+
+          setCurrentFeed( item.feed );
           // 이미지 배열 세팅 하는 함수 추가 예정
           setCurrentIndex(0);
+          // 팝업 open
+          setPopupVisible(true);
         });
         return marker;
       });
-    
+
       new kakao.maps.MarkerClusterer({
         map,
         averageCenter: true,
@@ -103,7 +140,7 @@ const Map = () => {
         }]
       })
     }
-  }, [])
+  }, [feedData]);
 
   return (
     <div className={styles.wrapper}>
@@ -116,9 +153,9 @@ const Map = () => {
         <input type="text" placeholder="장소 검색" />
       </div>
 
-      
+
       <div id="map" className={styles.mapContainer}></div>
-      
+
       {/* 팝업 */}
       {popupVisible && (
         <div className={styles.popupOverlay} /* onClick={() => setPopupVisible(false) } */>
@@ -130,16 +167,16 @@ const Map = () => {
             </div>
 
             {/* 슬라이드 이미지  */}
-            <div className={styles.sliderWrapper }>
-                <button className={styles.slideBtn} onClick={()=> prePhoto()}> 〈   </button>
-                <img src={photos[currentIndex]} alt="popup" className={styles.memoryImage} ></img>
-                <button className={styles.slideBtn} onClick={() => nextPhoto()}>  &nbsp;&nbsp;〉 </button>
+            <div className={styles.sliderWrapper}>
+              <button className={styles.slideBtn} onClick={() => prePhoto()}> 〈   </button>
+              <img src={photos[currentIndex]} alt="popup" className={styles.memoryImage} ></img>
+              <button className={styles.slideBtn} onClick={() => nextPhoto()}>  &nbsp;&nbsp;〉 </button>
             </div>
 
             <div className={styles.memoryContent}>
-              <h2 className={styles.title}>데이트했던 북악산!</h2>
-              <p className={styles.dateLocation}>2023.09.14 &nbsp;·&nbsp; 북악팔각정</p>
-              <p className={styles.desc} onClick={fn_test()}>정말 멋진 풍경과 함께한 하수~</p>
+              <h2 className={styles.title}>{currentFeed.title}</h2>
+              <p className={styles.dateLocation}>{currentFeed.date} · {currentFeed.location}</p>
+              <p className={styles.desc} >{currentFeed.description}</p>
 
               <div className={styles.actions}>
                 <span>♡ 좋아요 3</span>
@@ -153,7 +190,7 @@ const Map = () => {
           </div>
         </div>
       )}
-      <NavigationBar/>
+      <NavigationBar />
     </div>
   )
 }

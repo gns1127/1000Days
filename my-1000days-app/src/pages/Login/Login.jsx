@@ -33,10 +33,10 @@ const Login = () => {
     if (formatted === '20231127') {
       alert('정답');
       try {
-        await loginWithEmail(email, password);
+        const { user } = await loginWithEmail(email, password);
         console.log('로그인 성공 이동중..');
         //setMessage('로그인 성공! 이동 중…');
-        navigate('/home'); // ✅ 이동
+        if ( user ) navigate('/home'); // ✅ 이동
         
     } catch (err) {
       //setMessage(`로그인 실패: ${err.message}`);
