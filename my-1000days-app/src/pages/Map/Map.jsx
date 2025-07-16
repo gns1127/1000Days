@@ -22,7 +22,7 @@ const Map = () => {
 
   /* ───────── 로컬 state ───────── */
   const [feedData, setFeedData] = useState([]);
-  const [currentFeed, setcurrentFeed] = useState(null);
+  const [currentFeed, setCurrentFeed] = useState(null);
   const [popupVisible, setPopupVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   //const [popupImageUrl, setPopupImageUrl] = useState(''); 
@@ -38,8 +38,8 @@ const Map = () => {
   //const fn_test = () => { console.log( 'test 실행 ')};
   const fetchFeedPhotos = async (feedId) => {
     const { data, error } = await supabase
-      .from('feeds_photo')
-      .select('image_url')
+      .from('feed_photos')
+      .select('photo_url')
       .eq('feed_id', feedId);
 
     if (error) {
@@ -47,7 +47,8 @@ const Map = () => {
       return;
     }
 
-    setPhotos(data.map((d) => d.image_url)); // 또는 전체 data 그대로
+    console.log( data );
+    setPhotos(data.map((d) => d.photo_url)); // 또는 전체 data 그대로
   };
 
 
@@ -77,7 +78,6 @@ const Map = () => {
     };
 
     selectFeed();
-    console.log(feedData);
 
   }, [user]);
 
@@ -102,11 +102,9 @@ const Map = () => {
       ]
 
       feedData.forEach(e => {
-        markerData.push({ position: new kakao.maps.LatLng(e.location_lat, e.location_lng), id: e.id, feed });
+        markerData.push({ position: new kakao.maps.LatLng(e.location_lat, e.location_lng), id: e.id, feed: e });
       });
 
-      console.log('markerData');
-      console.log(markerData);
       const markers = markerData.map((item) => {
         const marker = new kakao.maps.Marker({ position: item.position });
         // 👉 클릭 이벤트 연결
