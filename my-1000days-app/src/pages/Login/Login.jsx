@@ -30,7 +30,7 @@ const Login = () => {
     const d = selected.getDate().toString().padStart(2, '0');
     const formatted = `${y}${m}${d}`;
 
-    if (formatted === '20231127') {
+    if (formatted === '20221127') {
       alert('정답');
       try {
         const { user } = await loginWithEmail(email, password);
