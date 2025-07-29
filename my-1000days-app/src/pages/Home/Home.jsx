@@ -4,6 +4,8 @@ import { FaClock, FaMapMarkerAlt, FaHome, FaPlus, FaUser } from 'react-icons/fa'
 import { useAuth } from '../../features/auth/useAuth';
 import { supabase } from '../../services/supabase';
 import NavigationBar from '@/components/NavigationBar/NavigationBar';
+import FeedDetail from '../FeedDetail/FeedDetail'; // FeedDetail 컴포넌트 import
+
 import './Home.css';
 
 const Home = () => {
@@ -11,6 +13,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [feeds, setFeeds] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedFeedId, setSelectedFeedId] = useState(null); // 선택된 피드 id
 
   useEffect(() => {
     if (!user) return; // 로그인된 사용자 없으면 대기
@@ -66,7 +69,7 @@ const Home = () => {
             <div
               key={feed.id}
               className="feed-card"
-              onClick={() => navigate(`/feed/${feed.id}`)}
+              onClick={() => setSelectedFeedId(feed.id)}
             >
               <img
                 src={feed.repPhoto || '/assets/placeholder.png'}
@@ -79,6 +82,13 @@ const Home = () => {
           ))}
         </div>
       </div>
+
+      {selectedFeedId && (
+        <div className="feed-detail-fullscreen">
+          <button className="back-button" onClick={() => setSelectedFeedId(null)}>←</button>
+          <FeedDetail feedId={selectedFeedId} onClose={() => setSelectedFeedId(null)} />
+        </div>
+      )}
 
       <NavigationBar active="home" />
     </div>
