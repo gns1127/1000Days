@@ -5,6 +5,7 @@ import { useAuth } from '../../features/auth/useAuth';
 import { supabase } from '../../services/supabase';
 import NavigationBar from '@/components/NavigationBar/NavigationBar';
 import FeedDetail from '../FeedDetail/FeedDetail'; // FeedDetail 컴포넌트 import
+import Feed from '../FeedDetail/Feed'; // FeedDetail 컴포넌트 import
 
 import './Home.css';
 
@@ -39,7 +40,7 @@ const Home = () => {
           };
         });
 
-        console.log(processed);
+
         setFeeds(processed);
       }
       setLoading(false);
@@ -55,7 +56,8 @@ const Home = () => {
   return (
     <div className="home-wrapper">
       <header className="home-header">
-        <h1 className="home-title">우리의 추억</h1>
+        {/*<h1 className="home-title">우리의 추억</h1>*/}
+        <h1 className="home-title"> 사진 </h1>
       </header>
 
       <div className="home-icons-fixed">
@@ -86,7 +88,8 @@ const Home = () => {
       {selectedFeedId && (
         <div className="feed-detail-fullscreen">
           <button className="back-button" onClick={() => setSelectedFeedId(null)}>←</button>
-          <FeedDetail feedId={selectedFeedId} onClose={() => setSelectedFeedId(null)} />
+          {/*<FeedDetail feedId={selectedFeedId} onClose={() => setSelectedFeedId(null)} />*/}
+          <Feed feedId={selectedFeedId} onClose={() => setSelectedFeedId(null)} />
         </div>
       )}
 
