@@ -64,7 +64,6 @@
   font-weight: bold;
 }
 
-/* 기존 스타일 아래에 추가 */
 .popupOverlay {
   position: fixed;
   inset: 0;
@@ -75,76 +74,6 @@
   z-index: 1000;
 }
 
-.memoryCard {
-  background: #fff;
-  border-radius: 20px 20px 20px 20px;
-  width: 100%;
-  max-width: 380px;
-  margin-bottom: env(safe-area-inset-bottom);
-  overflow: hidden;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
-  animation: slideUp 0.3s ease;
-}
-
-.closeDiv{
-  display: flex;
-  justify-content: end;
-  height: 30px;
-}
-
-.close_btn{
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  margin: 6px 10px 5px 0px;
-}
-
-.memoryImage {
-  width: 100%;
-  height: 300px;
-  margin-top: 5px;
-  display: block;
-}
-
-.memoryContent {
-  padding: 16px;
-  color: #333;
-}
-
-.title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-
-.dateLocation {
-  font-size: 14px;
-  color: #888;
-  margin-bottom: 8px;
-}
-
-.desc {
-  font-size: 15px;
-  margin-bottom: 12px;
-}
-
-.actions {
-  font-size: 14px;
-  color: #666;
-  display: flex;
-  gap: 16px;
-  margin-bottom: 12px;
-}
-
-.link {
-  font-size: 14px;
-  color: #e6005a;
-  font-weight: bold;
-}
-.link a {
-  text-decoration: none;
-  color: inherit;
-}
 
 @keyframes slideUp {
   from {
@@ -153,50 +82,4 @@
   to {
     transform: translateY(0%);
   }
-}
-.popupBox {
-  background: #fff;
-  padding: 10px;
-  border-radius: 10px;
-  max-width: 90%;
-  max-height: 80%;
-}
-
-.popupBox img {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
-
-/* 슬라이드 이미지 영역 */
-.sliderWrapper {
-  position: relative;
-  width: 100%;
-  height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.slideBtn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.6);
-  border: none;
-  font-size: 24px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  z-index: 10;
-}
-
-.slideBtn:first-of-type {
-  left: 12px;
-}
-
-.slideBtn:last-of-type {
-  right: 12px;
 }

@@ -30,7 +30,8 @@ const Login = () => {
     const d = selected.getDate().toString().padStart(2, '0');
     const formatted = `${y}${m}${d}`;
 
-    if (formatted === '20221127') {
+    //if (formatted === '20221127') {
+    if (formatted === '19971127') {
       alert('정답');
       try {
         const { user } = await loginWithEmail(email, password);
@@ -55,7 +56,7 @@ const Login = () => {
           <img src={heartLogo}  alt="우리의 100일 추억 로고" />
           
         </div>
-        <h1 className="login__title">우리가 처음 사귄 날짜는?</h1>
+        <h1 className="login__title">생년월일</h1>
         <div className="login__form">
           <DateInputWithCalendar selected={selected} onChange={setSelected} />
          

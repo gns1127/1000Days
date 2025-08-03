@@ -9,6 +9,9 @@ import { supabase } from '../../services/supabase';
 
 import NavigationBar from '@/components/NavigationBar/NavigationBar';
 import { AiOutlineClose } from 'react-icons/ai';
+
+import Feed from '../FeedDetail/Feed'; // FeedDetail 컴포넌트 import
+
 import test from '@/assets/image/test_img.jpg';  // 정적 이미지 import 추후 동적 이미지로 변경
 import test2 from '@/assets/image/test_img2.jpg';  // 정적 이미지 import 추후 동적 이미지로 변경
 import test3 from '@/assets/image/test_img3.jpg';  // 정적 이미지 import 추후 동적 이미지로 변경
@@ -25,6 +28,7 @@ const Map = () => {
   const [currentFeed, setCurrentFeed] = useState(null);
   const [popupVisible, setPopupVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedFeedId, setSelectedFeedId] = useState('');
   //const [popupImageUrl, setPopupImageUrl] = useState(''); 
   const [photos, setPhotos] = useState([]);
 
@@ -47,7 +51,6 @@ const Map = () => {
       return;
     }
 
-    console.log( data );
     setPhotos(data.map((d) => d.photo_url)); // 또는 전체 data 그대로
   };
 
@@ -61,7 +64,6 @@ const Map = () => {
 
       console.log('selectFeed 실행');
       if (!user) return;                  // user 준비됐는지 가드
-      console.log(user);
 
       const { data, error } = await supabase
         .from('feeds')
@@ -72,8 +74,6 @@ const Map = () => {
         console.error('피드 조회 오류:', error);
         return;
       }
-
-      console.log('supabase 결과:', data); // ✅ 쿼리 결과 즉시 확인 
       setFeedData(data);
     };
 
@@ -109,15 +109,12 @@ const Map = () => {
         const marker = new kakao.maps.Marker({ position: item.position });
         // 👉 클릭 이벤트 연결
         kakao.maps.event.addListener(marker, 'click', () => {
-
+          console.log( '마커 클릭');
           // Feed 이미지 연결
           fetchFeedPhotos( item.id );
 
-          setCurrentFeed( item.feed );
-          // 이미지 배열 세팅 하는 함수 추가 예정
-          setCurrentIndex(0);
-          // 팝업 open
-          setPopupVisible(true);
+          setSelectedFeedId( item.id );
+
         });
         return marker;
       });
@@ -143,7 +140,6 @@ const Map = () => {
   return (
     <div className={styles.wrapper}>
       <header className={styles.header}>
-        <button className={styles.backBtn}>←</button>
         <span className={styles.title}>지도에서 보기</span>
       </header>
 
@@ -155,39 +151,16 @@ const Map = () => {
       <div id="map" className={styles.mapContainer}></div>
 
       {/* 팝업 */}
-      {popupVisible && (
-        <div className={styles.popupOverlay} /* onClick={() => setPopupVisible(false) } */>
-          <div className={styles.memoryCard} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.closeDiv}>
-              <button className={styles.close_btn} onClick={() => setPopupVisible(false)}>
-                <AiOutlineClose size={24} />
-              </button>
-            </div>
-
-            {/* 슬라이드 이미지  */}
-            <div className={styles.sliderWrapper}>
-              <button className={styles.slideBtn} onClick={() => prePhoto()}> 〈   </button>
-              <img src={photos[currentIndex]} alt="popup" className={styles.memoryImage} ></img>
-              <button className={styles.slideBtn} onClick={() => nextPhoto()}>  &nbsp;&nbsp;〉 </button>
-            </div>
-
-            <div className={styles.memoryContent}>
-              <h2 className={styles.title}>{currentFeed.title}</h2>
-              <p className={styles.dateLocation}>{currentFeed.date} · {currentFeed.location}</p>
-              <p className={styles.desc} >{currentFeed.description}</p>
-
-              <div className={styles.actions}>
-                <span>♡ 좋아요 3</span>
-                <span>💬 댓글 2</span>
-              </div>
-
-              <div className={styles.link}>
-                <a href="#">자세히 보기 &gt;</a>
-              </div>
-            </div>
+      {selectedFeedId && (
+        <div className={styles.popupOverlay}>
+          <div className={styles.closeDiv}>
+            <button className={styles.close_btn} onClick={() => setSelectedFeedId(null)}>X</button>
           </div>
+          {/*<FeedDetail feedId={selectedFeedId} onClose={() => setSelectedFeedId(null)} />*/}
+          <Feed feedId={selectedFeedId} onClose={() => setSelectedFeedId(null)} />
         </div>
       )}
+
       <NavigationBar />
     </div>
   )
