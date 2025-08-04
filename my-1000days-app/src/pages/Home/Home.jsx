@@ -87,7 +87,6 @@ const Home = () => {
 
       {selectedFeedId && (
         <div className="feed-detail-fullscreen">
-          <button className="back-button" onClick={() => setSelectedFeedId(null)}>←</button>
           {/*<FeedDetail feedId={selectedFeedId} onClose={() => setSelectedFeedId(null)} />*/}
           <Feed feedId={selectedFeedId} onClose={() => setSelectedFeedId(null)} />
         </div>

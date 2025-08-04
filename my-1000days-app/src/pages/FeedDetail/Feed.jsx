@@ -55,6 +55,7 @@ const Feed = ({ feedId, onClose }) => {
         .eq('feed_id', feedId)
         .order('display_order');
 
+        console.log( feedData );
       setFeed(feedData);
 
       setPhotos(photoData);
@@ -83,7 +84,7 @@ const Feed = ({ feedId, onClose }) => {
 
   return (
     <div className="feed">
-      <button className="feed__close" onClick={() => setVisible(false)} aria-label="닫기">
+      <button className="feed__close" onClick={onClose} aria-label="닫기">
         <AiOutlineClose size={24} />
       </button>
 
@@ -114,7 +115,7 @@ const Feed = ({ feedId, onClose }) => {
         <p className="meta">
           {feed.feed_date.substring(0,10)} · {feed.building_name ? feed.building_name : feed.location }
         </p>
-        <p className="desc">{feedInfo.desc}</p>
+        <p className="desc">{feed.desc}</p>
         <p className="stat">
           ♥ 좋아요 {feedInfo.likes} · 💬 댓글 {feedInfo.comments.length }
         </p>
