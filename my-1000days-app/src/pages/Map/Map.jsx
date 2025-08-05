@@ -153,10 +153,6 @@ const Map = () => {
       {/* 팝업 */}
       {selectedFeedId && (
         <div className={styles.popupOverlay}>
-          <div className={styles.closeDiv}>
-            <button className={styles.close_btn} onClick={() => setSelectedFeedId(null)}>X</button>
-          </div>
-          {/*<FeedDetail feedId={selectedFeedId} onClose={() => setSelectedFeedId(null)} />*/}
           <Feed feedId={selectedFeedId} onClose={() => setSelectedFeedId(null)} />
         </div>
       )}

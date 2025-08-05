@@ -39,7 +39,8 @@ export function useAuth() {
   // 이메일 로그인
   const loginWithEmail = useCallback (async( email, password ) => {
     
-    
+    console.log( 'email :: ' + email );
+    console.log( 'password :: ' + password );
 
     setLoading(true);
     setError(null);

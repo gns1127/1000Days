@@ -55,6 +55,7 @@ const Feed = ({ feedId, onClose }) => {
         .eq('feed_id', feedId)
         .order('display_order');
 
+        console.log( feedData );
       setFeed(feedData);
 
       setPhotos(photoData);
@@ -83,9 +84,12 @@ const Feed = ({ feedId, onClose }) => {
 
   return (
     <div className="feed">
-      <button className="feed__close" onClick={() => setVisible(false)} aria-label="닫기">
-        <AiOutlineClose size={24} />
-      </button>
+      <div className="">
+        <button className="feed__close" onClick={onClose} aria-label="닫기">
+          <AiOutlineClose size={24} />
+        </button>
+      </div>
+      
 
       <div className="feed__photo-wrapper">
         {/*<Swiper spaceBetween={0} slidesPerView={1} className="feed-detail-swiper">
@@ -114,13 +118,15 @@ const Feed = ({ feedId, onClose }) => {
         <p className="meta">
           {feed.feed_date.substring(0,10)} · {feed.building_name ? feed.building_name : feed.location }
         </p>
-        <p className="desc">{feedInfo.desc}</p>
+        <p className="desc">{feed.desc}</p>
         <p className="stat">
           ♥ 좋아요 {feedInfo.likes} · 💬 댓글 {feedInfo.comments.length }
         </p>
       </section>
 
-      <section className="feed__comments">
+      {/*
+      좋아요, 댓글
+      <}section className="feed__comments">
         <h3>댓글</h3>
         { feedInfo.comments.length === 0 &&  <p className="empty">아직 댓글이 없습니다</p>}
         {feedInfo.comments.map((c) => (
@@ -130,7 +136,8 @@ const Feed = ({ feedId, onClose }) => {
           </div>
         ))}
       </section>
-
+      */
+      }
       {/*isAuthor && (
         <div className="feed__author-actions">
           <button onClick={handleEdit} className="edit">

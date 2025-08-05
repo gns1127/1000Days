@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import EXIF from 'exif-js';
+import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../../services/supabase';
 import { useAuth } from '../../features/auth/useAuth';
 import './Upload.css';
@@ -18,6 +19,9 @@ const Upload = () => {
   const [status, setStatus] = useState('');
   const [suggestions, setSuggestions] = useState([]);
 
+  const navigate = useNavigate()
+
+
   const fileInputRef = useRef();
   const mapRef = useRef(null);
   const markerRef = useRef(null);
@@ -25,6 +29,7 @@ const Upload = () => {
 
   // Initialize Kakao map and Places service
   useEffect(() => {
+
     if (!window.kakao || !window.kakao.maps) return;
     const container = document.getElementById('kakao-map');
     const options = { center: new window.kakao.maps.LatLng(37.5665, 126.9780), level: 5 };
@@ -57,7 +62,7 @@ const Upload = () => {
 
   // EXIF extraction and map update
   const extractGPS = (file) => {
-    EXIF.getData(file, function() {
+    EXIF.getData(file, function () {
       const lat = EXIF.getTag(this, 'GPSLatitude');
       const lon = EXIF.getTag(this, 'GPSLongitude');
       const latRef = EXIF.getTag(this, 'GPSLatitudeRef');
@@ -65,7 +70,7 @@ const Upload = () => {
       if (lat && lon) {
         const toDd = (dms, ref) => {
           const [d, m, s] = dms;
-          let dd = d + m/60 + s/3600;
+          let dd = d + m / 60 + s / 3600;
           return (ref === 'S' || ref === 'W') ? -dd : dd;
         };
         const latitude = toDd(lat, latRef);
@@ -134,7 +139,7 @@ const Upload = () => {
     }
   };
 
-    // Prevent Enter key submitting form in search input
+  // Prevent Enter key submitting form in search input
   const handleSearchKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -167,6 +172,7 @@ const Upload = () => {
     e.preventDefault();
     if (!user) return setStatus('로그인이 필요합니다.');
     if (!files.length) return setStatus('⚠️ 사진을 선택해 주세요.');
+    if (!title.length) return setStatus('⚠️ 제목을 입력해 주세요.');
 
     try {
       setStatus('피드 생성 중…');
@@ -202,6 +208,8 @@ const Upload = () => {
       setBuildingName('');
       setLatLng(null);
       fileInputRef.current.value = null;
+
+      navigate('/home');
     } catch (err) {
       console.error(err);
       setStatus(`❌ 오류: ${err.message}`);
@@ -228,9 +236,9 @@ const Upload = () => {
 
         {/* 장소 검색 Autocomplete */}
         <div style={{ position: 'relative', marginTop: '1rem' }}>
-          <input type="text" value={searchKeyword} onChange={e => { setSearchKeyword(e.target.value); placeServiceRef.current?.keywordSearch(e.target.value, placesSearchCB); }} 
-          onKeyDown={handleSearchKeyDown}
-          placeholder="장소 검색" 
+          <input type="text" value={searchKeyword} onChange={e => { setSearchKeyword(e.target.value); placeServiceRef.current?.keywordSearch(e.target.value, placesSearchCB); }}
+            onKeyDown={handleSearchKeyDown}
+            placeholder="장소 검색"
           />
           {suggestions.length > 0 && (
             <ul style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', maxHeight: '200px', overflowY: 'auto', zIndex: 1000, border: '1px solid #ccc', padding: 0, margin: 0, listStyle: 'none' }}>
