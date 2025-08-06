@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaClock, FaMapMarkerAlt, FaHome, FaPlus, FaUser } from 'react-icons/fa';
 import { useAuth } from '../../features/auth/useAuth';
@@ -9,45 +9,105 @@ import Feed from '../FeedDetail/Feed'; // FeedDetail 컴포넌트 import
 
 import './Home.css';
 
+const LIMIT = 18;
+
 const Home = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
+
   const [feeds, setFeeds] = useState([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+
+
   const [loading, setLoading] = useState(true);
   const [selectedFeedId, setSelectedFeedId] = useState(null); // 선택된 피드 id
+  const observerRef = useRef();
+  const feedIdSetRef = useRef(new Set()); // ✅ 중복 방지용
+
+  const fetchFeeds = useCallback(async () => {
+    if (!user && !hasMore) return; // 로그인된 사용자 없으면 대기
+
+    const from = page * LIMIT;
+    const to = from + LIMIT - 1;
+
+    console.log('form :: ' + from);
+    console.log('to :: ' + to);
+    // 방어 코드: from 또는 to가 음수가 되면 종료
+    if (from < 0 || to < 0) return;
+
+    const { data, error } = await supabase
+      .from('feeds')
+      .select(`id, title, feed_date, feed_photos(photo_url, display_order)`, { count: 'exact' })
+      .eq('user_id', user.id)
+      .order('feed_date', { ascending: false })
+      .range(from, to);
+
+    if (error) {
+      console.error('피드 조회 오류:', error);
+      return;
+    } else {
+
+      const newFeeds = [];
+
+      for (const feed of data) {
+        if (feedIdSetRef.current.has(feed.id)) continue;
+        feedIdSetRef.current.add(feed.id);
+
+        const photos = feed.feed_photos || [];
+        photos.sort((a, b) => a.display_order - b.display_order);
+
+        newFeeds.push({
+          id: feed.id,
+          title: feed.title,
+          date: feed.feed_date.slice(0, 10),
+          repPhoto: photos[0]?.photo_url || ''
+        })
+
+      }
+      //console.log( data );
+
+      /*const processed = data.map(feed => {
+        const photos = feed.feed_photos || [];
+        photos.sort((a, b) => a.display_order - b.display_order);
+        return {
+          id: feed.id,
+          title: feed.title,
+          date: feed.feed_date.slice(0, 10),
+          repPhoto: photos[0]?.photo_url || ''
+        };
+      });
+      */
+
+      setFeeds(prev => [...prev, ...newFeeds]);
+      if (data.length < LIMIT) setHasMore(false);
+      setLoading(false);
+    }
+  }, [page, user, hasMore]);
 
   useEffect(() => {
-    if (!user) return; // 로그인된 사용자 없으면 대기
-    const fetchFeeds = async () => {
-      const { data, error } = await supabase
-        .from('feeds')
-        .select(`id, title, feed_date, feed_photos(photo_url, display_order)`)
-        .eq('user_id', user.id)
-        .order('feed_date', { ascending: false });
+    if (user && hasMore) fetchFeeds();
+  }, [page, user]);
 
-      if (error) {
-        console.error('피드 조회 오류:', error);
-      } else {
-        //console.log( data );
-        const processed = data.map(feed => {
-          const photos = feed.feed_photos || [];
-          photos.sort((a, b) => a.display_order - b.display_order);
-          return {
-            id: feed.id,
-            title: feed.title,
-            date: feed.feed_date.slice(0, 10),
-            repPhoto: photos[0]?.photo_url || ''
-          };
-        });
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage(prev => prev + 1);
+        }
+      },
+      { threshold: 1 }
+    );
 
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
 
-        setFeeds(processed);
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
       }
-      setLoading(false);
-    };
-
-    fetchFeeds();
-  }, [user]);
+    }
+  }, [hasMore]);
 
   if (loading) {
     return <div className="home-loading">로딩 중…</div>;
