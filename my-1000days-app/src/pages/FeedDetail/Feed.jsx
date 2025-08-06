@@ -118,10 +118,12 @@ const Feed = ({ feedId, onClose }) => {
         <p className="meta">
           {feed.feed_date.substring(0,10)} · {feed.building_name ? feed.building_name : feed.location }
         </p>
-        <p className="desc">{feed.desc}</p>
-        <p className="stat">
-          ♥ 좋아요 {feedInfo.likes} · 💬 댓글 {feedInfo.comments.length }
-        </p>
+        <p className="desc">{feed.description}</p>
+        {/* 
+                  <p className="stat">
+            ♥ 좋아요 {feedInfo.likes} · 💬 댓글 {feedInfo.comments.length }
+          </p>
+        */}
       </section>
 
       {/*
