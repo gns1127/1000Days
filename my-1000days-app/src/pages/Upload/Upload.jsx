@@ -12,6 +12,9 @@ const Upload = () => {
   const { user } = useAuth();
   const [files, setFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
+  
+  const [previews, setPreviews] = useState([]); // [{ file, url }]
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
@@ -105,48 +108,53 @@ const Upload = () => {
   const handleFileChange = async (e) => {
     const selected = Array.from(e.target.files);
     const uniqueNew = selected.filter(
-      nf => !files.some(f => f.name === nf.name && f.lastModified === nf.lastModified)
-    );
+      nf => !previews.some(p => p.file.name === nf.name && p.file.lastModified === nf.lastModified)
+  );
     const updated = [...files, ...uniqueNew].slice(0, 10);
 
-    previewUrls.forEach(url => URL.revokeObjectURL(url));
-    //const previews = updated.map(f => URL.createObjectURL(f));
+    const allFiles = [...previews.map(p => p.file), ...uniqueNew].slice(0, 10);
 
-    // 압축된 파일 목록을 만들어서 preview만 압축본을 사용
-    const compressedFiles = await Promise.all(
-      updated.map((file) =>
-        imageCompression(file, {
-          maxSizeMB: 0.3,             // 300KB 이하로 압축
-          maxWidthOrHeight: 800,     // 800px 이하로 축소
-          useWebWorker: true,
-        })
-      )
-    );
+  // 압축된 파일 → preview 용도
+  const compressedFiles = await Promise.all(
+    allFiles.map(file =>
+      imageCompression(file, {
+        maxSizeMB: 0.3,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+      })
+    )
+  );
+     // 기존 URL 제거
+  previews.forEach(p => URL.revokeObjectURL(p.url));
 
-    const previews = compressedFiles.map(f => URL.createObjectURL(f));
-    setPreviewUrls(previews);
-    //setFiles(updated);
-    //setPreviewUrls(previews);
+  const newPreviews = compressedFiles.map((blob, i) => ({
+    file: allFiles[i],
+    url: URL.createObjectURL(blob)
+  }));
 
-    const dt = new DataTransfer();
-    updated.forEach(f => dt.items.add(f));
-    fileInputRef.current.files = dt.files;
+  setPreviews(newPreviews);
 
-    if (uniqueNew[0]) extractGPS(uniqueNew[0]);
+  // input 업데이트
+  const dt = new DataTransfer();
+  allFiles.forEach(f => dt.items.add(f));
+  fileInputRef.current.files = dt.files;
+
+  // EXIF는 첫 이미지만
+  if (uniqueNew[0]) extractGPS(uniqueNew[0]);
   };
 
   // Remove image
   const handleRemoveImage = (idx) => {
-    URL.revokeObjectURL(previewUrls[idx]);
-    const remaining = files.filter((_, i) => i !== idx);
-    const remainingPreviews = remaining.map(f => URL.createObjectURL(f));
+    const removed = previews[idx];
+  URL.revokeObjectURL(removed.url);
 
-    setFiles(remaining);
-    setPreviewUrls(remainingPreviews);
+  const remaining = previews.filter((_, i) => i !== idx);
+  setPreviews(remaining);
 
-    const dt = new DataTransfer();
-    remaining.forEach(f => dt.items.add(f));
-    fileInputRef.current.files = dt.files;
+  // input.files 업데이트
+  const dt = new DataTransfer();
+  remaining.forEach(p => dt.items.add(p.file));
+  fileInputRef.current.files = dt.files;
   };
 
   // Autocomplete callback
@@ -187,6 +195,9 @@ const Upload = () => {
   // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const files = previews.map(p => p.file); // ✅ 원본 파일 배열로 추출
+    
     if (!user) return setStatus('로그인이 필요합니다.');
     if (!files.length) return setStatus('⚠️ 사진을 선택해 주세요.');
     if (!title.length) return setStatus('⚠️ 제목을 입력해 주세요.');
@@ -239,9 +250,9 @@ const Upload = () => {
       <form onSubmit={handleSubmit} className="upload-form">
         <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileChange} />
         <div className="preview-gallery">
-          {previewUrls.map((url, idx) => (
+          {previews.map((p, idx) => (
             <div key={idx} className="preview-wrapper">
-              <img src={url} alt={`prev-${idx}`} className="preview-image" />
+              <img src={p.url} alt={`prev-${idx}`} className="preview-image" />
               <button type="button" className="remove-button" onClick={() => handleRemoveImage(idx)}>✕</button>
             </div>
           ))}
