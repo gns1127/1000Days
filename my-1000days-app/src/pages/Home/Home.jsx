@@ -9,7 +9,7 @@ import Feed from '../FeedDetail/Feed'; // FeedDetail 컴포넌트 import
 
 import './Home.css';
 
-const LIMIT = 18;
+const LIMIT = 12;
 
 const Home = () => {
   const { user } = useAuth();
