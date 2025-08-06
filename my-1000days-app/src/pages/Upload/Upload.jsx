@@ -3,6 +3,9 @@ import EXIF from 'exif-js';
 import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../../services/supabase';
 import { useAuth } from '../../features/auth/useAuth';
+import DateInputWithCalendar from '@/components/DateInputWithCalendar';
+import imageCompression from 'browser-image-compression';
+
 import './Upload.css';
 
 const Upload = () => {
@@ -18,6 +21,7 @@ const Upload = () => {
   const [latLng, setLatLng] = useState(null);
   const [status, setStatus] = useState('');
   const [suggestions, setSuggestions] = useState([]);
+
 
   const navigate = useNavigate()
 
@@ -98,7 +102,7 @@ const Upload = () => {
   };
 
   // Handle file selection
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const selected = Array.from(e.target.files);
     const uniqueNew = selected.filter(
       nf => !files.some(f => f.name === nf.name && f.lastModified === nf.lastModified)
@@ -106,10 +110,23 @@ const Upload = () => {
     const updated = [...files, ...uniqueNew].slice(0, 10);
 
     previewUrls.forEach(url => URL.revokeObjectURL(url));
-    const previews = updated.map(f => URL.createObjectURL(f));
+    //const previews = updated.map(f => URL.createObjectURL(f));
 
-    setFiles(updated);
+    // 압축된 파일 목록을 만들어서 preview만 압축본을 사용
+    const compressedFiles = await Promise.all(
+      updated.map((file) =>
+        imageCompression(file, {
+          maxSizeMB: 0.3,             // 300KB 이하로 압축
+          maxWidthOrHeight: 800,     // 800px 이하로 축소
+          useWebWorker: true,
+        })
+      )
+    );
+
+    const previews = compressedFiles.map(f => URL.createObjectURL(f));
     setPreviewUrls(previews);
+    //setFiles(updated);
+    //setPreviewUrls(previews);
 
     const dt = new DataTransfer();
     updated.forEach(f => dt.items.add(f));
@@ -218,7 +235,7 @@ const Upload = () => {
 
   return (
     <div className="upload-container">
-      <h2 className="upload-title">추억 업로드</h2>
+      {/*<h2 className="upload-title">추억 업로드</h2>*/}
       <form onSubmit={handleSubmit} className="upload-form">
         <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileChange} />
         <div className="preview-gallery">
@@ -232,7 +249,8 @@ const Upload = () => {
 
         <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="제목" />
         <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="설명" />
-        <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+        <DateInputWithCalendar selected={date} onChange={setDate} />
+        {/*<input type="date" value={date} onChange={e => setDate(e.target.value)} />*/}
 
         {/* 장소 검색 Autocomplete */}
         <div style={{ position: 'relative', marginTop: '1rem' }}>
