@@ -4,12 +4,12 @@ import { FaClock, FaMapMarkerAlt, FaHome, FaPlus, FaUser } from 'react-icons/fa'
 import { useAuth } from '../../features/auth/useAuth';
 import { supabase } from '../../services/supabase';
 import NavigationBar from '@/components/NavigationBar/NavigationBar';
-import FeedDetail from '../FeedDetail/FeedDetail'; // FeedDetail 컴포넌트 import
+
 import Feed from '../FeedDetail/Feed'; // FeedDetail 컴포넌트 import
 
 import './Home.css';
 
-const LIMIT = 12;
+const LIMIT = 3;
 
 const Home = () => {
   const { user } = useAuth();
@@ -142,6 +142,7 @@ const Home = () => {
             </div>
 
           ))}
+          <div ref={observerRef} style={{ height: '1px' }} /> {/* ✅ 여기! */}
         </div>
       </div>
 
