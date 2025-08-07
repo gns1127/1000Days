@@ -1,5 +1,5 @@
 // src/pages/Map/Map.jsx
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import styles from './Map.module.css';
 
 
@@ -25,19 +25,19 @@ const Map = () => {
 
   /* ───────── 로컬 state ───────── */
   const [feedData, setFeedData] = useState([]);
-  const [currentFeed, setCurrentFeed] = useState(null);
-  const [popupVisible, setPopupVisible] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedFeedId, setSelectedFeedId] = useState('');
-  //const [popupImageUrl, setPopupImageUrl] = useState(''); 
-  const [photos, setPhotos] = useState([]);
+
+  const [suggestions, setSuggestions] = useState([]); // 👈 자동완성 결과 저장
+
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const placeServiceRef = useRef(null);
+
+  const mapRef = useRef(null);
+  //const markerRef = useRef(null);
+
 
   /* ───────── 로그인 안 된 경우 가드 ───────── */
   //if (!user) return navigate('/login');
-
-
-  const prePhoto = () => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1) };
-  const nextPhoto = () => { if (currentIndex < photos.length - 1) setCurrentIndex(currentIndex + 1) };
 
   //const fn_test = () => { console.log( 'test 실행 ')};
   const fetchFeedPhotos = async (feedId) => {
@@ -51,13 +51,64 @@ const Map = () => {
       return;
     }
 
-    setPhotos(data.map((d) => d.photo_url)); // 또는 전체 data 그대로
+    //setPhotos(data.map((d) => d.photo_url)); // 또는 전체 data 그대로
+  };
+
+  const handleSearch = () => {
+    if (!searchKeyword || !placeServiceRef.current) return;
+
+    placeServiceRef.current.keywordSearch(searchKeyword, (data, status) => {
+      if (status === window.kakao.maps.services.Status.OK && data.length > 0) {
+        const place = data[0];
+        const lat = parseFloat(place.y);
+        const lng = parseFloat(place.x);
+
+        const position = new window.kakao.maps.LatLng(lat, lng);
+
+        if (mapRef.current) mapRef.current.setCenter(position);
+        //if (markerRef.current) markerRef.current.setPosition(position);
+      } else {
+        alert('검색 결과가 없습니다!');
+      }
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const keyword = e.target.value;
+    setSearchKeyword(keyword);
+
+    if (keyword && placeServiceRef.current) {
+      placeServiceRef.current.keywordSearch(keyword, (data, status) => {
+        if (status === window.kakao.maps.services.Status.OK) {
+          console.log( 'setSuggestions' );
+          console.log( data );
+          setSuggestions(data);
+        } else {
+          setSuggestions([]);
+        }
+      });
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (item) => {
+    setSearchKeyword(item.place_name);
+    setSuggestions([]); // 리스트 닫기
+
+    const lat = parseFloat(item.y);
+    const lng = parseFloat(item.x);
+    const position = new window.kakao.maps.LatLng(lat, lng);
+    if (mapRef.current) {
+      mapRef.current.setCenter(position);
+    }
   };
 
 
   /* 피드 조회 */
   useEffect(() => {
     if (!user) return;      // 아직 세션이 안 왔으면 기다림
+
 
     // 피드 데이터 조회
     const selectFeed = async () => {
@@ -91,15 +142,14 @@ const Map = () => {
         level: 7,
       }
 
+      placeServiceRef.current = new window.kakao.maps.services.Places();
 
-      const map = new window.kakao.maps.Map(container, options)
+      const map = new window.kakao.maps.Map(container, options);
 
-      // 마커 클러스터러 (임시 데이터) 추후 db통신해서 가져오기
-      const markerData = [
-        { position: new kakao.maps.LatLng(37.57, 126.98), id: 999 },
-        { position: new kakao.maps.LatLng(37.56, 126.97), id: 998 },
-        { position: new kakao.maps.LatLng(37.55, 126.96), id: 997 },
-      ]
+      mapRef.current = map;
+      //markerRef.current = new kakao.maps.Marker({ map });
+
+      const markerData = [];
 
       feedData.forEach(e => {
         markerData.push({ position: new kakao.maps.LatLng(e.location_lat, e.location_lng), id: e.id, feed: e });
@@ -109,11 +159,11 @@ const Map = () => {
         const marker = new kakao.maps.Marker({ position: item.position });
         // 👉 클릭 이벤트 연결
         kakao.maps.event.addListener(marker, 'click', () => {
-          console.log( '마커 클릭');
+          console.log('마커 클릭');
           // Feed 이미지 연결
-          fetchFeedPhotos( item.id );
+          fetchFeedPhotos(item.id);
 
-          setSelectedFeedId( item.id );
+          setSelectedFeedId(item.id);
 
         });
         return marker;
@@ -144,7 +194,32 @@ const Map = () => {
       </header>
 
       <div className={styles.searchBar}>
-        <input type="text" placeholder="장소 검색" />
+        <input type="text"
+          placeholder="장소 검색"
+          value={searchKeyword}
+          onChange={handleInputChange}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') 
+            {
+            e.preventDefault(); // 👉 폼 submit 방지 (선택)
+            handleSearch();
+            setSuggestions([]); // ✅ 자동완성 닫기
+            }
+          }} />
+        {suggestions.length > 0 && (
+          <ul className={styles.suggestionUl}>
+            {suggestions.map((item, i) => (
+              
+              <li 
+                key={i}
+                className={styles.suggestionLi}
+                onClick={() => handleSuggestionClick(item)}
+              >
+                {item.place_name}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
 
