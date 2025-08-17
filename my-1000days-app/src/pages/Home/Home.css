@@ -1,22 +1,16 @@
 .home-wrapper {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  height: 100vh;
+  align-items: stretch;
+  height: 100dvh;              /* 모바일 주소창 변동에도 안정 */
   background: #fff;
   font-family: 'SUIT', sans-serif;
-  overflow: hidden;
+  overflow: hidden;            /* body 스크롤 잠금 */
 }
 
 .home-header {
   padding-top: 24px;
   text-align: center;
-}
-
-.home-date {
-  font-size: 14px;
-  color: #999;
-  margin-bottom: 4px;
 }
 
 .home-title {
@@ -38,8 +32,14 @@
 
 /* 🔽 사진 스크롤 영역 */
 .scroll-area {
-  flex: 1;
+  /* 높이는 JS(useLayoutEffect)에서 픽셀로 강제 지정 */
+  flex: 1 1 auto;
+  min-height: 0;                         /* iOS flex + overflow 스크롤 이슈 방지 */
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;     /* iOS 관성 스크롤 */
+  overscroll-behavior: contain;          /* 상위로 스크롤 체인 방지 */
+  touch-action: pan-y;                   /* 모바일 수직 스크롤 힌트 */
+
   width: 100%;
   padding: 0 20px;
   box-sizing: border-box;
@@ -54,47 +54,25 @@
 
 .photo {
   width: 100%;
-  aspect-ratio: 1 / 1.5;
+  aspect-ratio: 1 / 2;   /* 자리 고정: 이미지 로딩으로 인한 튐 방지 */
   object-fit: cover;
   border-radius: 10px;
+  display: block;
 }
 
-/* 하단 고정 네비게이션 */
-.home-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  max-width: 480px;
-  height: 60px;
-  background: #fff;
-  border-top: 1px solid #ddd;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  z-index: 100;
-}
-
-.footer-icon {
-  font-size: 20px;
-  color: #aaa;
-}
-
-.footer-icon.main {
-  font-size: 26px;
-  color: #000;
-}
-
-
-
+/* 선택된 피드 상세(기존 프로젝트 스타일 유지) */
 .feed-detail-fullscreen {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: white;
+  inset: 0;
+  background: #fff;
   z-index: 999;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+}
+
+.home-loading {
+  text-align: center;
+  padding: 12px 0;
+  color: #666;
+  font-size: 14px;
 }
