@@ -24,8 +24,17 @@ const Home = () => {
   const observerRef = useRef();
   const feedIdSetRef = useRef(new Set()); // ✅ 중복 방지용
 
+  // 추가: 스크롤 영역 ref
+  const scrollAreaRef = useRef(null);
+
+  // 로딩 중 중복 호출 방지용
+  const isFetchingRef = useRef(false);
+
   const fetchFeeds = useCallback(async () => {
     if (!user && !hasMore) return; // 로그인된 사용자 없으면 대기
+    if (isFetchingRef.current) return;    // ✅ 중복 호출 방지
+    isFetchingRef.current = true;
+    setLoading(true);
 
     const from = page * LIMIT;
     const to = from + LIMIT - 1;
@@ -63,6 +72,7 @@ const Home = () => {
           repPhoto: photos[0]?.photo_url || ''
         })
 
+
       }
       //console.log( data );
 
@@ -80,6 +90,7 @@ const Home = () => {
 
       setFeeds(prev => [...prev, ...newFeeds]);
       if (data.length < LIMIT) setHasMore(false);
+      isFetchingRef.current = false;
       setLoading(false);
     }
   }, [page, user, hasMore]);
@@ -89,13 +100,20 @@ const Home = () => {
   }, [page, user]);
 
   useEffect(() => {
+    if (!scrollAreaRef.current) return;
+
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && hasMore) {
           setPage(prev => prev + 1);
         }
       },
-      { threshold: 1 }
+      {
+        root: scrollAreaRef.current,  // ✅ 내부 스크롤 기준
+        rootMargin: '200px',          // ✅ 미리 당겨서 로드
+        threshold: 0                  // ✅ 살짝만 보여도 트리거
+
+      }
     );
 
     if (observerRef.current) {
@@ -107,7 +125,7 @@ const Home = () => {
         observer.unobserve(observerRef.current);
       }
     }
-  }, [hasMore]);
+  }, [hasMore, loading]);
 
   if (loading) {
     return <div className="home-loading">로딩 중…</div>;
@@ -125,7 +143,7 @@ const Home = () => {
         <FaMapMarkerAlt className="home-icon" />
       </div>
 
-      <div className="scroll-area">
+      <div className="scroll-area" ref={scrollAreaRef}>
         <div className="home-photo-grid">
           {feeds.map(feed => (
             <div
