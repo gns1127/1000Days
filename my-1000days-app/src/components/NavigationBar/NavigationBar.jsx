@@ -29,11 +29,11 @@ const NavigationBar = () => {
       </div>
       <FaHeart
         className={`${styles.icon} ${isActive('/favorites') ? styles.active : ''}`}
-        onClick={movePage('/favorites')}
+        /*onClick={movePage('/favorites')}*/
       />
       <FaUser
         className={`${styles.icon} ${isActive('/profile') ? styles.active : ''}`}
-        onClick={movePage('/profile')}
+        /*onClick={movePage('/profile')}*/
       />
     </footer>
   )
