@@ -71,6 +71,8 @@
 }
 .feed__info .desc {
   margin: 0.5rem 0;
+  white-space: pre-line; /* ✅ 줄바꿈(\n) 반영 */
+  
 }
 .feed__info .stat {
   font-size: 0.85rem;
