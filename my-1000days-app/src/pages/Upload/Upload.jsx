@@ -5,7 +5,7 @@ import { supabase } from '../../services/supabase';
 import { useAuth } from '../../features/auth/useAuth';
 import DateInputWithCalendar from '@/components/DateInputWithCalendar';
 import imageCompression from 'browser-image-compression';
-
+import NavigationBar from '@/components/NavigationBar/NavigationBar';
 import './Upload.css';
 
 const Upload = () => {
@@ -290,6 +290,7 @@ const Upload = () => {
         <button type="submit" className="upload-button">업로드</button>
       </form>
       {status && <p className="status-message">{status}</p>}
+      <NavigationBar active="home" />
     </div>
   );
 };
