@@ -34,11 +34,11 @@ const Login = () => {
     if (formatted === '20221127') {
 
       Swal.fire({
-        title: '🎉 양양아, 1000일 축하해 💖',
+        title: '🎉 1000일 축하해 🎉<br>💖',
         html: `
         <strong style="font-size: 1.2rem; color: #ff6f91;">
-우리의 추억을 담은 포토앱에 온 걸 환영해!<br/>
-앞으로도 함께 더 많은 소중한 순간을 만들어가자 😊<br/>
+우리의 추억을 담은 <br>포토앱에 온 걸 환영해!<br/>
+앞으로도 좋은 추억 같이 쌓아가자 😊<br/>
 사랑해 💌
 
     </strong>
