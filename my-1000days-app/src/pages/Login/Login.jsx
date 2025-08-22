@@ -5,12 +5,12 @@ import heartLogo from '@/assets/image/heartLogo.png';
 import DateInputWithCalendar from '@/components/DateInputWithCalendar';
 import LoginButton from '@/components/LoginButton';
 import { supabase } from '../../services/supabase';
-import { useAuth  } from '../../features/auth/useAuth'
-
+import { useAuth } from '../../features/auth/useAuth'
+import Swal from 'sweetalert2';
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 
-const email    = import.meta.env.VITE_EMAIL    || '';
+const email = import.meta.env.VITE_EMAIL || '';
 const password = import.meta.env.VITE_PASSWORD || '';
 
 const Login = () => {
@@ -32,19 +32,37 @@ const Login = () => {
 
     //if (formatted === '20221127') {
     if (formatted === '20221127') {
-      alert('정답');
+
+      Swal.fire({
+        title: '🎉 양양아, 1000일 축하해 💖',
+        html: `
+        <strong style="font-size: 1.2rem; color: #ff6f91;">
+우리의 추억을 담은 포토앱에 온 걸 환영해!<br/>
+앞으로도 함께 더 많은 소중한 순간을 만들어가자 😊<br/>
+사랑해 💌
+
+    </strong>
+  `,
+        confirmButtonText: 'OK',
+      });
+
       try {
         const { user } = await loginWithEmail(email, password);
         console.log('로그인 성공 이동중..');
         //setMessage('로그인 성공! 이동 중…');
-        if ( user ) navigate('/home'); // ✅ 이동
-        
-    } catch (err) {
-      //setMessage(`로그인 실패: ${err.message}`);
-    }
+        if (user) navigate('/home'); // ✅ 이동
+
+      } catch (err) {
+        //setMessage(`로그인 실패: ${err.message}`);
+      }
 
     } else {
-      alert('틀렸습니다.');
+      Swal.fire({
+        icon: 'error',
+        title: '너 누구야👀👀',
+        confirmButtonText: 'OK',
+      });
+
     }
   };
 
@@ -53,13 +71,13 @@ const Login = () => {
     <div className="login">
       <div className="login__container">
         <div className="login__logo">
-          <img src={heartLogo}  alt="우리의 1000일 추억 로고" />
-          
+          <img src={heartLogo} alt="우리의 1000일 추억 로고" />
+
         </div>
         <h1 className="login__title">우리가 사귄 날은 언제였나요? 💕</h1>
         <div className="login__form">
           <DateInputWithCalendar selected={selected} onChange={setSelected} />
-         
+
 
           <button className="login__button" onClick={handleCheckDate}>입력</button>
         </div>
